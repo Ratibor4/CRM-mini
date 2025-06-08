@@ -1,0 +1,132 @@
+{% extends "crm/base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Хлебные крошки и кнопки навигации -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'crm:client_list' %}">Все клиенты</a></li>
+            <li class="breadcrumb-item active">{{ client.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Сделки клиента: {{ client.name }}</h5>
+            <div>
+                <a href="{% url 'crm:client_list' %}" class="btn btn-sm btn-light me-2">
+                    <i class="fas fa-arrow-left"></i> К списку клиентов
+                </a>
+                <a href="{% url 'crm:deal_create' %}?client={{ client.id }}" class="btn btn-sm btn-success">
+                    <i class="fas fa-plus"></i> Новая сделка
+                </a>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <!-- Фильтр по статусу -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <form method="get" class="input-group">
+                        <select name="status" class="form-select" onchange="this.form.submit()">
+                            <option value="all" {% if status_filter == 'all' %}selected{% endif %}>Все статусы</option>
+                            {% for value, name in status_choices %}
+                                <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-primary">Применить</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Таблица сделок -->
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Сумма</th>
+                            <th>Статус</th>
+                            <th>Дата создания</th>
+                            <th>Описание</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for deal in page_obj %}
+                        <tr>
+                            <td>{{ deal.id }}</td>
+                            <td>{{ deal.amount }}</td>
+                            <td>
+                                <span class="badge status-{{ deal.status }}">
+                                    {{ deal.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ deal.created_at|date:"d.m.Y H:i" }}</td>
+                            <td>{{ deal.description|truncatechars:30 }}</td>
+                            <td>
+                                <a href="{% url 'crm:deal_edit' deal.id %}" class="btn btn-sm btn-warning" title="Редактировать">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'crm:deal_delete' deal.id %}" class="btn btn-sm btn-danger" title="Удалить">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4">Нет сделок с выбранным статусом</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Пагинация -->
+            {% if page_obj.has_other_pages %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}">
+                                <i class="fas fa-angle-double-left"></i> Первая
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}">
+                                <i class="fas fa-angle-left"></i> Предыдущая
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}">
+                                Следующая <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}">
+                                Последняя <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
