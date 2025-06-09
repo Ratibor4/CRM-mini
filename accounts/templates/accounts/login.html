@@ -1,0 +1,47 @@
+{% extends "accounts/base_auth.html" %}
+
+{% block title %}Вход | CRM Mini{% endblock %}
+
+{% block auth_title %}Вход в систему{% endblock %}
+
+{% block auth_subtitle %}Введите свои учетные данные{% endblock %}
+
+{% block auth_content %}
+<form method="post" class="auth-form">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="errorlist">
+        {{ form.non_field_errors }}
+    </div>
+    {% endif %}
+
+    <div class="form-group">
+        <label for="{{ form.username.id_for_label }}">Имя пользователя</label>
+        {{ form.username }}
+        {% if form.username.errors %}
+        <div class="errorlist">{{ form.username.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        <label for="{{ form.password.id_for_label }}">Пароль</label>
+        {{ form.password }}
+        {% if form.password.errors %}
+        <div class="errorlist">{{ form.password.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        <label>
+            {{ form.remember_me }} Запомнить меня
+        </label>
+    </div>
+
+    <button type="submit" class="btn">Войти</button>
+</form>
+{% endblock %}
+
+{% block auth_footer %}
+Нет аккаунта? <a href="{% url 'register' %}">Зарегистрироваться</a>
+{% endblock %}

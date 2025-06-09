@@ -4,6 +4,9 @@ from . import views
 app_name = 'crm'
 
 urlpatterns = [
+    # Главная
+    path('', views.home_view, name='home'),
+
     # Клиенты
     path('clients/', views.client_list, name='client_list'),
     path('clients/create/', views.client_create, name='client_create'),

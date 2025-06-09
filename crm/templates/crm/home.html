@@ -1,0 +1,14 @@
+{% extends 'crm/base.html' %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+    <h1 class="mb-4 text-success">Добро пожаловать в mini-CRM</h1>
+
+    <div class="d-flex justify-content-center gap-3">
+        <a href="{% url 'login' %}" class="btn btn-outline-success btn-lg px-4">🔐 Вход</a>
+        <a href="{% url 'register' %}" class="btn btn-outline-success btn-lg px-4">📝 Регистрация</a>
+        <a href="{% url 'crm:client_list' %}" class="btn btn-success btn-lg px-4">📋 Клиенты</a>
+
+    </div>
+</div>
+{% endblock %}
